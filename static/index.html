@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Colombia AI Street Cam - 9:16 TikTok Live</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Inter:wght@500;700;800&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      width: 1080px;
+      height: 1920px;
+      background: #07090e;
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      border: 4px solid #1e293b;
+    }
+
+    /* Colombian Flag Neon Top Bar */
+    .flag-bar {
+      height: 14px;
+      width: 100%;
+      display: flex;
+    }
+    .flag-yellow { flex: 2; background: #facc15; box-shadow: 0 0 16px #facc15; }
+    .flag-blue   { flex: 1; background: #2563eb; box-shadow: 0 0 16px #2563eb; }
+    .flag-red    { flex: 1; background: #dc2626; box-shadow: 0 0 16px #dc2626; }
+
+    /* Header */
+    .header {
+      padding: 22px 32px;
+      background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(7,9,14,0.9) 100%);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid rgba(56, 189, 248, 0.25);
+    }
+    .title-group h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 36px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #facc15, #38bdf8, #f87171);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .title-group p {
+      font-size: 19px;
+      color: #94a3b8;
+      margin-top: 4px;
+    }
+    .live-pill {
+      background: rgba(220, 38, 38, 0.2);
+      border: 2px solid #ef4444;
+      padding: 10px 20px;
+      border-radius: 999px;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      color: #fca5a5;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+    .dot {
+      width: 14px;
+      height: 14px;
+      background: #ef4444;
+      border-radius: 50%;
+      animation: pulse 1.2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.35); opacity: 0.5; }
+    }
+
+    /* Live Camera Section (Top Half) */
+    .video-container {
+      position: relative;
+      width: 100%;
+      height: 680px;
+      background: #000;
+      overflow: hidden;
+      border-bottom: 3px solid #38bdf8;
+    }
+    .video-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Floating Total Counter on Video */
+    .hud-total {
+      position: absolute;
+      top: 20px;
+      left: 24px;
+      background: rgba(9, 13, 22, 0.85);
+      border: 2px solid #38bdf8;
+      backdrop-filter: blur(8px);
+      padding: 14px 24px;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+    .hud-total .label {
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: #38bdf8;
+      font-weight: 700;
+    }
+    .hud-total .value {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 52px;
+      font-weight: 900;
+      color: #ffffff;
+    }
+
+    /* Special Meme Alert Banner (Taxi / Prado / Twingo) */
+    .special-alert {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+      background: linear-gradient(90deg, #facc15, #f59e0b);
+      color: #090d16;
+      padding: 14px 34px;
+      border-radius: 999px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+      box-shadow: 0 0 35px rgba(250, 204, 21, 0.85);
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .special-alert.active {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+
+    /* Colombian Special Counters Row */
+    .special-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      padding: 22px 28px 12px;
+    }
+    .stat-card {
+      background: linear-gradient(145deg, #111827, #0b0f19);
+      border: 2px solid #1e293b;
+      border-radius: 18px;
+      padding: 16px 18px;
+      text-align: center;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    }
+    .stat-card.taxi  { border-color: rgba(250, 204, 21, 0.6); }
+    .stat-card.moto  { border-color: rgba(56, 189, 248, 0.6); }
+    .stat-card.prado { border-color: rgba(34, 197, 94, 0.6); }
+    .stat-card.twingo{ border-color: rgba(244, 63, 94, 0.6); }
+
+    .stat-card .emoji { font-size: 32px; }
+    .stat-card .name {
+      font-size: 16px;
+      font-weight: 800;
+      color: #94a3b8;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .stat-card .num {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 38px;
+      font-weight: 900;
+      margin-top: 4px;
+    }
+    .stat-card.taxi .num  { color: #facc15; }
+    .stat-card.moto .num  { color: #38bdf8; }
+    .stat-card.prado .num { color: #4ade80; }
+    .stat-card.twingo .num{ color: #fb7185; }
+
+    /* Main Bottom Split: Brand Leaderboard + Just Spotted Crop Ticker */
+    .bottom-panel {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 22px;
+      padding: 14px 28px 28px;
+      overflow: hidden;
+    }
+
+    .panel-box {
+      background: #0d1322;
+      border: 2px solid #1e293b;
+      border-radius: 22px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+    }
+    .panel-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: #e2e8f0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Leaderboard Bars */
+    .brand-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      flex: 1;
+      justify-content: center;
+    }
+    .brand-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .brand-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 22px;
+      font-weight: 800;
+    }
+    .brand-bar-bg {
+      width: 100%;
+      height: 22px;
+      background: #1e293b;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .brand-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+
+    /* Recent Crops Feed */
+    .spotted-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      overflow: hidden;
+    }
+    .spotted-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      background: #131c31;
+      border: 1px solid #263554;
+      padding: 10px 14px;
+      border-radius: 16px;
+      animation: slideIn 0.35s ease-out;
+    }
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to   { transform: translateY(0); opacity: 1; }
+    }
+    .spotted-item img {
+      width: 110px;
+      height: 76px;
+      object-fit: cover;
+      border-radius: 10px;
+      border: 2px solid #38bdf8;
+    }
+    .spotted-info {
+      flex: 1;
+    }
+    .spotted-info .b-name {
+      font-size: 22px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .spotted-info .b-sub {
+      font-size: 16px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+    .badge-tag {
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 800;
+      background: #facc15;
+      color: #000;
+    }
+
+    /* Footer Prompt for TikTok Chat */
+    .footer-cta {
+      padding: 14px 28px;
+      background: #0b1120;
+      border-top: 2px solid #1e293b;
+      text-align: center;
+      font-size: 21px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+    .footer-cta span {
+      color: #facc15;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="flag-bar">
+    <div class="flag-yellow"></div>
+    <div class="flag-blue"></div>
+    <div class="flag-red"></div>
+  </div>
+
+  <div class="header">
+    <div class="title-group">
+      <h1>🇨🇴 COLOMBIA STREET AI</h1>
+      <p>Cámara en Vivo 24/7 • RTX 4060 Local Vision</p>
+    </div>
+    <div class="live-pill">
+      <div class="dot"></div>
+      <span id="fps-text">LIVE • 60 FPS</span>
+    </div>
+  </div>
+
+  <div class="video-container">
+    <img src="/video_feed" alt="Live AI Feed" />
+    <div class="hud-total">
+      <div class="label">Vehículos Hoy</div>
+      <div class="value" id="total-vehicles">0</div>
+    </div>
+    <div class="special-alert" id="special-alert">🚕 ¡TAXI DETECTADO!</div>
+  </div>
+
+  <!-- Fun Colombian Counters -->
+  <div class="special-grid">
+    <div class="stat-card taxi">
+      <div class="emoji">🚕</div>
+      <div class="name">Taxis Amarillos</div>
+      <div class="num" id="taxis-count">0</div>
+    </div>
+    <div class="stat-card moto">
+      <div class="emoji">🏍️</div>
+      <div class="name">Motos vs Carros</div>
+      <div class="num" id="motos-count">0</div>
+    </div>
+    <div class="stat-card prado">
+      <div class="emoji">🚙</div>
+      <div class="name">Toyota Prado</div>
+      <div class="num" id="prado-count">0</div>
+    </div>
+    <div class="stat-card twingo">
+      <div class="emoji">👑</div>
+      <div class="name">Twingo Counter</div>
+      <div class="num" id="twingo-count">0</div>
+    </div>
+  </div>
+
+  <div class="bottom-panel">
+    <!-- Left: Top Brands Leaderboard -->
+    <div class="panel-box">
+      <div class="panel-title">
+        <span>🏆 Top Marcas Hoy</span>
+      </div>
+      <div class="brand-list" id="brand-list"></div>
+    </div>
+
+    <!-- Right: Live Cropped Car Ticker -->
+    <div class="panel-box">
+      <div class="panel-title">
+        <span>📸 Últimos Detectados</span>
+      </div>
+      <div class="spotted-list" id="spotted-list"></div>
+    </div>
+  </div>
+
+  <div class="footer-cta">
+    💬 ¡Comenta qué marca crees que ganará hoy! <span>#Colombia #CarSpotter #IA</span>
+  </div>
+
+  <script>
+    let lastAlertTs = 0;
+
+    function connectWS() {
+      const ws = new WebSocket(`ws://${location.host}/ws`);
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        renderState(data);
+      };
+      ws.onclose = () => setTimeout(connectWS, 2000);
+    }
+
+    function renderState(data) {
+      document.getElementById('total-vehicles').textContent = data.total_vehicles.toLocaleString();
+      document.getElementById('taxis-count').textContent = data.taxis_count.toLocaleString();
+      document.getElementById('prado-count').textContent = data.prado_count.toLocaleString();
+      document.getElementById('twingo-count').textContent = data.twingo_count.toLocaleString();
+
+      const motos = data.counts_by_type?.moto || 0;
+      const cars = data.counts_by_type?.car || 0;
+      document.getElementById('motos-count').textContent = `${motos} / ${cars}`;
+      document.getElementById('fps-text').textContent = `LIVE • ${data.fps} FPS`;
+
+      // Render Top Brands
+      const brandList = document.getElementById('brand-list');
+      const maxBrandCount = Math.max(1, ...(data.top_brands || []).map(b => b.count));
+      const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
+      brandList.innerHTML = (data.top_brands || []).map((item, idx) => {
+        const pct = Math.round((item.count / maxBrandCount) * 100);
+        return `
+          <div class="brand-row">
+            <div class="brand-meta">
+              <span>${medals[idx] || ''} ${item.brand}</span>
+              <span>${item.count}</span>
+            </div>
+            <div class="brand-bar-bg">
+              <div class="brand-bar-fill" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Render Recent Cropped Spottings
+      const spottedList = document.getElementById('spotted-list');
+      spottedList.innerHTML = (data.recent_spottings || []).slice(0, 4).map(s => `
+        <div class="spotted-item">
+          <img src="${s.thumb}" alt="crop" />
+          <div class="spotted-info">
+            <div class="b-name">${s.brand} ${s.model !== 'Unknown' ? s.model : ''}</div>
+            <div class="b-sub">${s.timestamp} • #${s.track_id} • ${s.color}</div>
+          </div>
+          ${s.is_taxi ? '<span class="badge-tag">TAXI 🚕</span>' : ''}
+        </div>
+      `).join('');
+
+      // Trigger Special Alert Banner
+      if (data.latest_alert && data.latest_alert.ts !== lastAlertTs) {
+        lastAlertTs = data.latest_alert.ts;
+        const alertEl = document.getElementById('special-alert');
+        if (data.latest_alert.tag === 'PRADO') {
+          alertEl.textContent = `🚙 ¡ALERTA TOYOTERO: ${data.latest_alert.text}!`;
+        } else if (data.latest_alert.tag === 'TWINGO') {
+          alertEl.textContent = `👑 ¡UN TWINGO LEGENDARIO DETECTADO!`;
+        } else {
+          alertEl.textContent = `🚕 ¡AMARILLO DETECTADO: ${data.latest_alert.text}!`;
+        }
+        alertEl.classList.add('active');
+        setTimeout(() => alertEl.classList.remove('active'), 3500);
+      }
+    }
+
+    connectWS();
+  </script>
+</body>
+</html>

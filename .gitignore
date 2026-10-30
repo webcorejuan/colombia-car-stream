@@ -1,0 +1,8 @@
+venv/
+.venv/
+__pycache__/
+*.pyc
+.env
+*.pt
+daily_stats.json
+.DS_Store
